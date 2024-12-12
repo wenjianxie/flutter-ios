@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 void main() {
-
   WidgetsFlutterBinding.ensureInitialized();
-  MyApp.initializeChannel();
   runApp(MyApp());
 }
 
@@ -17,7 +15,25 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(title: Text('Flutter')),
         body: Center(
-          child: Text('Listening for iOS calls...'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () {
+                  // 初始化通道处理器
+                  MyApp.initializeChannel();
+                },
+                child: Text("点击开启快捷指令"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  // 调用原生方法
+                  await MyApp.invokeNativeMethod();
+                },
+                child: Text("调用原生方法"),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -37,5 +53,13 @@ class MyApp extends StatelessWidget {
           );
       }
     });
+  }
+
+  static Future<void> invokeNativeMethod() async {
+    try {
+      final String result = await _channel.invokeMethod("methodToIOS", {"key": "value哈哈哈"});
+    } on PlatformException catch (e) {
+      print("Failed to invoke method: ${e.message}");
+    }
   }
 }
